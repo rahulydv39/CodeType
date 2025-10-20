@@ -9,25 +9,41 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { BarChart } from "lucide-react";
+import { BarChart, BarChart2 } from "lucide-react";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartStyle } from "@/components/ui/chart";
+import { Bar, XAxis, YAxis, CartesianGrid, BarChart as RechartsBarChart } from "recharts";
 
 type TypingResultsProps = {
   wpm: number;
   accuracy: number;
   errors: number;
   time: number;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 };
 
-export default function TypingResults({ wpm, accuracy, errors, time }: TypingResultsProps) {
+export default function TypingResults({ wpm, accuracy, errors, time, open, onOpenChange }: TypingResultsProps) {
+  const chartData = [
+    { name: "WPM", value: Math.round(wpm), fill: "hsl(var(--primary))" },
+    { name: "Accuracy", value: Math.round(accuracy), fill: "hsl(var(--accent))" },
+    { name: "Errors", value: errors, fill: "hsl(var(--destructive))" },
+  ];
+
+  const chartConfig = {
+    value: {
+      label: "Value",
+    },
+  };
+  
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button>
-          <BarChart className="mr-2" />
+          <BarChart2 className="mr-2" />
           Detailed Analysis
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="font-headline text-2xl">Typing Results</DialogTitle>
         </DialogHeader>
@@ -47,6 +63,20 @@ export default function TypingResults({ wpm, accuracy, errors, time }: TypingRes
            <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
             <span className="text-muted-foreground">Time Taken</span>
             <span className="text-xl font-bold font-headline">{time.toFixed(1)}s</span>
+          </div>
+          <div className="mt-4">
+            <ChartContainer config={chartConfig} className="w-full h-[200px]">
+              <RechartsBarChart data={chartData} layout="vertical" margin={{ left: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" hide />
+                <YAxis dataKey="name" type="category" tickLine={false} axisLine={false} />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Bar dataKey="value" radius={5} />
+              </RechartsBarChart>
+            </ChartContainer>
           </div>
         </div>
         <DialogFooter>

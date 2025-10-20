@@ -4,8 +4,10 @@ import { useTyping } from "@/lib/hooks/use-typing";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { Play, RefreshCw } from "lucide-react";
 import TypingResults from "./typing-results";
+import CodeOutput from "./code-output";
+import React, { useEffect, useRef, useState } from "react";
 
 type CharacterProps = {
   char: string;
@@ -32,10 +34,16 @@ function Cursor() {
   );
 }
 
-export default function TypingPractice({ code }: { code: string }) {
+export default function TypingPractice({ code, language }: { code: string, language: string }) {
   const { state, characters, typed, errors, wpm, accuracy, totalTime, reset } = useTyping(code);
-
+  const [showResults, setShowResults] = useState(false);
   const isFinished = state === "finish";
+
+  useEffect(() => {
+    if (isFinished) {
+      setShowResults(true);
+    }
+  }, [isFinished]);
 
   return (
     <div className="w-full max-w-4xl flex flex-col items-center gap-8">
@@ -44,9 +52,12 @@ export default function TypingPractice({ code }: { code: string }) {
           <div className="font-code text-lg sm:text-xl leading-relaxed tracking-wider relative">
             <p className="whitespace-pre-wrap" aria-label={code}>
               {characters.map((char, index) => (
-                <Character key={index} char={char.char} state={char.state} />
+                <React.Fragment key={index}>
+                  {typed.length === index && <Cursor />}
+                  <Character char={char.char} state={char.state} />
+                </React.Fragment>
               ))}
-              {state !== "finish" && <Cursor />}
+              {typed.length === code.length && isFinished && <Cursor />}
             </p>
           </div>
         </CardContent>
@@ -73,7 +84,10 @@ export default function TypingPractice({ code }: { code: string }) {
         </div>
         <div className="flex gap-2">
           {isFinished && (
-             <TypingResults wpm={wpm} accuracy={accuracy} errors={errors} time={totalTime} />
+            <>
+              <TypingResults open={showResults} onOpenChange={setShowResults} wpm={wpm} accuracy={accuracy} errors={errors} time={totalTime} />
+              {language !== 'typing' && <CodeOutput code={code} language={language} />}
+            </>
           )}
           <Button onClick={reset} variant="outline" size="icon" aria-label="Restart Practice">
             <RefreshCw />

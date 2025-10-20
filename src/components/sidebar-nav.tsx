@@ -9,7 +9,7 @@ import {
 import { codeSnippets } from "@/lib/code-snippets";
 import { CppIcon, HtmlIcon, JavaScriptIcon, PythonIcon } from "@/components/icons";
 import { cn } from "@/lib/utils";
-import { Lock } from "lucide-react";
+import { Keyboard, Lock, Type } from "lucide-react";
 
 type SidebarNavProps = {
   selectedLanguage: string;
@@ -18,10 +18,13 @@ type SidebarNavProps = {
 };
 
 const languageIcons: Record<string, React.ReactNode> = {
+  typing: <Keyboard className="size-5" />,
   python: <PythonIcon className="size-5" />,
   cpp: <CppIcon className="size-5" />,
   html: <HtmlIcon className="size-5" />,
   javascript: <JavaScriptIcon className="size-5" />,
+  typescript: <Type className="size-5" />,
+  c: <span className="font-bold text-lg w-5 text-center">C</span>,
 };
 
 export default function SidebarNav({

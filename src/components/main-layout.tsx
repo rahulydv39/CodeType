@@ -63,7 +63,8 @@ export default function MainLayout() {
             {currentSnippet ? (
               <TypingPractice 
                 key={`${selectedLanguage}-${selectedChapterIndex}`}
-                code={currentSnippet.code} 
+                code={currentSnippet.code}
+                language={selectedLanguage}
               />
             ) : (
               <p>Select a chapter to begin.</p>
