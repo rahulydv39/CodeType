@@ -1,3 +1,4 @@
+
 export type Chapter = {
   title: string;
   code: string | null;
@@ -12,19 +13,37 @@ export const codeSnippets: Record<string, Language> = {
   typing: {
     name: "Typing Skills",
     chapters: [
-      {
-        title: "Easy: The Quick Brown Fox",
-        code: `the quick brown fox jumps over the lazy dog`,
-      },
-      {
-        title: "Moderate: Pangrams",
-        code: `Sphinx of black quartz, judge my vow. The five boxing wizards jump quickly. Pack my box with five dozen liquor jugs.`,
-      },
-      {
-        title: "Hard: Special Characters",
-        code: `~ \` ! @ # $ % ^ & * ( ) _ - + = { } [ ] | \\ : ; " ' < > , . ? /`,
-      },
-    ],
+      { title: "Easy 1", code: `The sun is shining and the birds are singing. It's a beautiful day to go for a walk in the park. Many people enjoy the simple pleasures of life.` },
+      { title: "Easy 2", code: `My friend and I are going to the movies tonight. We are excited to see the new film. Popcorn is a must-have snack for any movie.` },
+      { title: "Easy 3", code: `Cooking can be a fun and relaxing hobby. I like to try new recipes on the weekend. My favorite dish to make is pasta with fresh tomatoes.` },
+      { title: "Easy 4", code: `Reading a good book is a great way to unwind. I have a collection of classic novels. The library is a wonderful place to discover new authors.` },
+      { title: "Easy 5", code: `Music can lift your spirits and change your mood. I enjoy listening to a wide variety of genres. A catchy song can stay in your head for days.` },
+      { title: "Easy 6", code: `Learning a new skill takes time and patience. Practice is the key to improvement. It is rewarding to see your progress over time.` },
+      { title: "Easy 7", code: `Traveling allows you to experience different cultures. I dream of visiting far-off lands. Every journey begins with a single step.` },
+      { title: "Easy 8", code: `Keeping a journal can help you organize your thoughts. Writing down your ideas is a good habit. It's interesting to look back at old entries.` },
+      { title: "Easy 9", code: `Spending time with family and friends is important. Strong relationships are built on trust and love. Laughter is the best medicine for the soul.` },
+      { title: "Easy 10", code: `A healthy diet and regular exercise are vital for well-being. Eating fresh fruits and vegetables is good for you. A morning run can energize your day.` },
+      { title: "Moderate 1", code: `The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet. It's a classic pangram used for typing practice.` },
+      { title: "Moderate 2", code: `Technology has revolutionized the way we live and work, offering both convenience and new challenges. We must adapt to keep up with the pace of innovation.` },
+      { title: "Moderate 3", code: `Juggling multiple tasks requires strong organizational skills. Prioritizing your work and managing your time effectively are crucial for success.` },
+      { title: "Moderate 4", code: `The sphinx of black quartz, judge my vow. This pangram is more complex and poetic. It tests your ability to type less common letter combinations.` },
+      { title: "Moderate 5", code: `Climate change is a significant global issue that requires immediate attention. International cooperation is essential to find sustainable solutions.` },
+      { title: "Moderate 6", code: `The history of the ancient world is filled with fascinating stories of empires, myths, and legends. Exploring these tales can be quite enlightening.` },
+      { title: "Moderate 7", code: `Creativity is the ability to generate or recognize ideas, alternatives, or possibilities that may be useful in solving problems, communicating with others.` },
+      { title: "Moderate 8", code: `Pack my box with five dozen liquor jugs. This is another popular pangram. It is short but effective for practicing all the letters.` },
+      { title: "Moderate 9", code: `The pursuit of knowledge is a lifelong journey. Every day presents an opportunity to learn something new and expand your understanding of the world.` },
+      { title: "Moderate 10", code: `Problem-solving involves defining a problem, determining the cause, identifying, prioritizing, and selecting alternatives for a solution.` },
+      { title: "Hard 1", code: `~ \` ! @ # $ % ^ & * ( ) _ - + = { } [ ] | \\ : ; " ' < > , . ? /` },
+      { title: "Hard 2", code: `The function's signature is func(arg1, arg2) -> { return arg1 + arg2; }. Pay attention to the syntax: parentheses(), curly braces{}, and arrows->.` },
+      { title: "Hard 3", code: `My password is "p@$$w0rd_!@#". It's a mix of special characters, numbers, and letters for security. Remember to use strong, unique passwords.` },
+      { title: "Hard 4", code: `The file path is C:\\Users\\Default\\Documents. Notice the backslashes (\\) and colons (:). This is a common format in Windows.` },
+      { title: "Hard 5", code: `The JSON object is {"key": "value", "number": 123}. It uses quotes, colons, and commas to structure data. This is a popular data interchange format.` },
+      { title: "Hard 6", code: `SQL queries like SELECT * FROM users WHERE id = 1; often contain special characters. Semicolons (;), asterisks (*), and equal signs (=) are common.` },
+      { title: "Hard 7", code: `Regular expressions such as /^[a-z0-9_-]{3,16}$/ are powerful but complex. They use characters like ^, $, -, and {}.` },
+      { title: "Hard 8", code: `HTML tags like <div class="container"> require angle brackets and quotes. Attributes are assigned with an equals sign.` },
+      { title: "Hard 9", code: `You can reach me at 'user.name+alias@example.com'. Email addresses can contain periods, plus signs, and the at symbol (@).` },
+      { title: "Hard 10", code: `The calculation is ( ( 5 + 3 ) * 2 ) / 4 = 4. Parentheses are used to control the order of operations in mathematics.` }
+    ]
   },
   javascript: {
     name: "JavaScript",
