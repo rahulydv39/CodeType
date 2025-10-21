@@ -48,7 +48,7 @@ export default function TypingPractice({ code, language, chapterIndex }: { code:
       let rowIndex = 0;
       if (i > 0) {
         for (let j = 0; j < i; j++) {
-          rowIndex += rows[j].children.length + 1; // +1 for newline
+          rowIndex += (rows[j].children?.length || 0) + 1; // +1 for newline
         }
       } else {
         rowIndex = 0;
@@ -56,11 +56,27 @@ export default function TypingPractice({ code, language, chapterIndex }: { code:
 
       return (
         <div key={`row-${i}`}>
-          {row.children.map((item: any, j: number) => {
+          {row.children?.map((item: any, j: number) => {
+            if (item.type === 'text') {
+                 // This is for plain text, like newlines
+                 const charIndex = rowIndex + j;
+                 const isCurrent = charIndex === typed.length;
+                 const isTyped = charIndex < typed.length;
+
+                return (
+                  <span key={`char-${i}-${j}`}>
+                    {isCurrent && <Cursor />}
+                    {item.value}
+                  </span>
+                );
+            }
+
             const charIndex = rowIndex + j;
             const isTyped = charIndex < typed.length;
             const isCorrect = isTyped && typed[charIndex] === item.children[0].value;
             const isCurrent = charIndex === typed.length;
+
+            const color = (item.properties.style && item.properties.style.color) ? item.properties.style.color : '';
 
             return (
               <span
@@ -70,14 +86,14 @@ export default function TypingPractice({ code, language, chapterIndex }: { code:
                    !isTyped && "text-muted-foreground/50",
                    isTyped && !isCorrect && "text-red-500 bg-red-500/20",
                 )}
-                style={{color: isTyped && !isCorrect ? '' : item.properties.style.color}}
+                style={{color: isTyped && !isCorrect ? '' : color}}
               >
                 {isCurrent && <Cursor />}
                 {item.children[0].value}
               </span>
             );
           })}
-          {i < rows.length - 1 && <span>{typed.length === rowIndex + row.children.length && <Cursor />}
+          {i < rows.length - 1 && <span>{typed.length === rowIndex + (row.children?.length || 0) && <Cursor />}
           <br/></span>}
         </div>
       );
