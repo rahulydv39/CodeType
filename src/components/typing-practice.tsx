@@ -4,10 +4,10 @@ import { useTyping } from "@/lib/hooks/use-typing";
 import { cn } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Play, RefreshCw } from "lucide-react";
+import { RefreshCw } from "lucide-react";
 import TypingResults from "./typing-results";
 import CodeOutput from "./code-output";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 type CharacterProps = {
   char: string;
@@ -15,6 +15,9 @@ type CharacterProps = {
 };
 
 function Character({ char, state }: CharacterProps) {
+  if (char === "\n") {
+    return <br />;
+  }
   return (
     <span
       className={cn({
@@ -30,7 +33,7 @@ function Character({ char, state }: CharacterProps) {
 
 function Cursor() {
   return (
-    <span className="animate-pulse text-primary font-bold text-lg -ml-[0.2em] -mr-[0.2em]">|</span>
+    <span className="animate-blink bg-primary w-[2px] h-5 sm:h-6 inline-block -mb-1 sm:-mb-1.5" />
   );
 }
 

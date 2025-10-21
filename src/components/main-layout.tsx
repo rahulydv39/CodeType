@@ -13,17 +13,26 @@ import {
 import { codeSnippets } from "@/lib/code-snippets";
 import SidebarNav from "./sidebar-nav";
 import TypingPractice from "./typing-practice";
-import { Code, Bot } from "lucide-react";
+import { Code, Bot, Sun, Moon } from "lucide-react";
+import { Button } from "./ui/button";
 
 export default function MainLayout() {
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
   const [selectedChapterIndex, setSelectedChapterIndex] = useState(0);
+  const [theme, setTheme] = useState("dark");
 
   const handleSelectChapter = (language: string, chapterIndex: number) => {
     setSelectedLanguage(language);
     setSelectedChapterIndex(chapterIndex);
   };
 
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
+    setTheme(newTheme);
+    document.documentElement.classList.remove(theme);
+    document.documentElement.classList.add(newTheme);
+  };
+  
   const currentSnippet =
     codeSnippets[selectedLanguage]?.chapters[selectedChapterIndex];
 
@@ -51,13 +60,18 @@ export default function MainLayout() {
       </Sidebar>
       <SidebarInset className="flex flex-col">
         <header className="flex items-center justify-between p-4 border-b">
-          <SidebarTrigger />
           <div className="flex items-center gap-2">
-            <Code className="size-5" />
-            <h2 className="text-lg font-headline font-medium">
-              {currentSnippet?.title || "Typing Practice"}
-            </h2>
+            <SidebarTrigger />
+            <div className="flex items-center gap-2">
+              <Code className="size-5" />
+              <h2 className="text-lg font-headline font-medium">
+                {currentSnippet?.title || "Typing Practice"}
+              </h2>
+            </div>
           </div>
+          <Button onClick={toggleTheme} variant="outline" size="icon">
+            {theme === 'light' ? <Moon className="size-5" /> : <Sun className="size-5" />}
+          </Button>
         </header>
         <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
             {currentSnippet ? (

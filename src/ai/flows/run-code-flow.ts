@@ -9,6 +9,8 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
+import { spawn } from 'child_process';
+
 
 const RunCodeInputSchema = z.object({
   code: z.string().describe('The code snippet to execute.'),
@@ -31,18 +33,47 @@ const runCodeTool = ai.defineTool(
       outputSchema: RunCodeOutputSchema,
     },
     async (input) => {
-      // This is a placeholder. In a real environment, you would use a secure code execution sandbox.
       console.log(`Executing ${input.language} code:`, input.code);
+      
+      const execute = (command: string, args: string[]): Promise<{ output: string, error?: string }> => {
+        return new Promise((resolve) => {
+          const process = spawn(command, args);
+          let output = '';
+          let error = '';
+
+          process.stdout.on('data', (data) => {
+            output += data.toString();
+          });
+
+          process.stderr.on('data', (data) => {
+            error += data.toString();
+          });
+          
+          process.on('close', (code) => {
+            if (code !== 0) {
+              resolve({ output, error: error || `Process exited with code ${code}` });
+            } else {
+              resolve({ output, error: error || undefined });
+            }
+          });
+
+          process.on('error', (err) => {
+            resolve({ output: '', error: err.message });
+          });
+
+          if (command === 'node' || command === 'python') {
+            process.stdin.write(input.code);
+            process.stdin.end();
+          }
+        });
+      };
+
       try {
         if (input.language === 'javascript') {
-            let output = '';
-            const oldLog = console.log;
-            console.log = (...args) => {
-                output += args.map(arg => typeof arg === 'string' ? arg : JSON.stringify(arg, null, 2)).join(' ') + '\n';
-            }
-            eval(input.code);
-            console.log = oldLog;
-            return { output };
+            return await execute('node', ['-e', input.code]);
+        }
+        if (input.language === 'python') {
+            return await execute('python', ['-c', input.code]);
         }
         return { error: `Execution for ${input.language} is not implemented.` };
       } catch (e: any) {
@@ -59,6 +90,7 @@ const runCodeFlow = ai.defineFlow(
     tools: [runCodeTool]
   },
   async (input) => {
+    // This is a simple implementation. In a real world scenario you might want to ask an LLM to execute the code.
     const result = await runCodeTool(input);
     return result;
   }

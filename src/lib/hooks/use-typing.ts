@@ -61,6 +61,7 @@ export const useTyping = (text: string) => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      e.preventDefault();
       if (state === 'finish') {
         if (e.key === 'Enter') reset();
         return;
@@ -71,7 +72,17 @@ export const useTyping = (text: string) => {
           return;
       }
 
-      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (e.key === 'Enter') {
+        if (state === 'start') {
+          setState('run');
+          startTime.current = Date.now();
+        }
+        if (text[currentPosition] === '\n') {
+          setTyped(prev => prev + '\n');
+        } else {
+          setErrors(prev => prev + 1);
+        }
+      } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
         if (state === 'start') {
           setState('run');
           startTime.current = Date.now();
