@@ -24,7 +24,7 @@ function Character({ char, state }: { char: string; state: string }) {
         "text-muted-foreground/50": isUntyped,
       })}
     >
-      {char}
+      {char === '\n' ? '↵\n' : char}
     </span>
   );
 }
@@ -47,13 +47,15 @@ export default function TypingPractice({ code, language, chapterIndex }: { code:
       if (chapterTitle) {
         saveProgress(wpm, cpm, accuracy, totalTime, language, chapterTitle);
       }
+    } else {
+      setShowResults(false);
     }
   }, [isFinished, saveProgress, wpm, cpm, accuracy, totalTime, language, chapterIndex]);
   
 
   return (
     <div className="w-full max-w-4xl flex flex-col items-center gap-8">
-      <Card className="w-full relative shadow-[0_0_15px_rgba(var(--primary),0.2)] ring-1 ring-primary/20">
+      <Card className="w-full relative shadow-[0_0_25px_rgba(var(--primary),0.3)] ring-1 ring-primary/30">
         <CardContent className="p-6 sm:p-8">
           <div className="font-code text-lg sm:text-xl leading-relaxed tracking-wider relative">
             <pre className="whitespace-pre-wrap">
