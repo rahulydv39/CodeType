@@ -24,7 +24,7 @@ function Character({ char, state }: { char: string; state: string }) {
         "text-muted-foreground/50": isUntyped,
       })}
     >
-      {char === '\n' ? '↵\n' : char}
+      {char}
     </span>
   );
 }
@@ -36,7 +36,7 @@ function Cursor() {
 }
 
 export default function TypingPractice({ code, language, chapterIndex }: { code: string, language: string, chapterIndex: number }) {
-  const { state, characters, typed, errors, wpm, cpm, accuracy, totalTime, reset, saveProgress } = useTyping(code);
+  const { state, characters, typed, errors, wpm, cpm, accuracy, totalTime, reset, saveProgress } = useTyping(code, language);
   const [showResults, setShowResults] = useState(false);
   const isFinished = state === "finish";
 
@@ -53,7 +53,7 @@ export default function TypingPractice({ code, language, chapterIndex }: { code:
 
   return (
     <div className="w-full max-w-4xl flex flex-col items-center gap-8">
-      <Card className="w-full relative">
+      <Card className="w-full relative shadow-[0_0_15px_rgba(var(--primary),0.2)] ring-1 ring-primary/20">
         <CardContent className="p-6 sm:p-8">
           <div className="font-code text-lg sm:text-xl leading-relaxed tracking-wider relative">
             <pre className="whitespace-pre-wrap">

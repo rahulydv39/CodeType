@@ -6,7 +6,7 @@ import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 type State = 'start' | 'run' | 'finish';
 type CharState = 'correct' | 'incorrect' | 'untyped';
 
-export const useTyping = (text: string) => {
+export const useTyping = (text: string, language: string) => {
   const [state, setState] = useState<State>('start');
   const [typed, setTyped] = useState<string>('');
   const [errors, setErrors] = useState<number>(0);
@@ -127,7 +127,7 @@ const finalCPM = useMemo(() => {
         e.preventDefault();
         
         if (e.key === 'Tab') {
-          const spaces = '   ';
+          const spaces = language === 'javascript' ? '  ' : '    ';
           let correct = true;
           for (let i = 0; i < spaces.length; i++) {
               if (currentPosition + i >= text.length || text[currentPosition + i] !== ' ') {
@@ -170,7 +170,7 @@ const finalCPM = useMemo(() => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [text, typed, state, reset, currentPosition]);
+  }, [text, typed, state, reset, currentPosition, language]);
 
   useEffect(() => {
     reset();
