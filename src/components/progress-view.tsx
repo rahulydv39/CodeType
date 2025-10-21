@@ -74,33 +74,45 @@ export default function ProgressView() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {progress.slice().reverse().map((p, i) => (
-                    <TableRow key={i}>
-                      <TableCell>{codeSnippets[p.language]?.name}</TableCell>
-                      <TableCell>{p.chapter}</TableCell>
-                      <TableCell className="text-right">{Math.round(p.wpm)}</TableCell>
-                      <TableCell className="text-right">{Math.round(p.cpm)}</TableCell>
-                      <TableCell className="text-right">{p.accuracy.toFixed(1)}%</TableCell>
+                  {progress.length > 0 ? (
+                    progress.slice().reverse().map((p, i) => (
+                      <TableRow key={i}>
+                        <TableCell>{codeSnippets[p.language]?.name || p.language}</TableCell>
+                        <TableCell>{p.chapter}</TableCell>
+                        <TableCell className="text-right">{Math.round(p.wpm)}</TableCell>
+                        <TableCell className="text-right">{Math.round(p.cpm)}</TableCell>
+                        <TableCell className="text-right">{p.accuracy.toFixed(1)}%</TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center">No progress yet. Complete a chapter to see your results!</TableCell>
                     </TableRow>
-                  ))}
+                  )}
                 </TableBody>
               </Table>
             </ScrollArea>
           </div>
           <div>
             <h3 className="font-headline text-lg mb-2">WPM Over Time</h3>
-            <ChartContainer config={chartConfig} className="w-full h-96">
-                <RechartsBarChart data={chartData} layout="vertical" margin={{ left: 20, right: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" />
-                    <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={100} interval={0} />
-                    <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent indicator="dot" />}
-                    />
-                    <Bar dataKey="wpm" fill="var(--color-wpm)" radius={4} />
-                </RechartsBarChart>
-            </ChartContainer>
+            {progress.length > 0 ? (
+              <ChartContainer config={chartConfig} className="w-full h-96">
+                  <RechartsBarChart data={chartData} layout="vertical" margin={{ left: 20, right: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" dataKey="wpm" />
+                      <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={100} interval={0} />
+                      <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent indicator="dot" />}
+                      />
+                      <Bar dataKey="wpm" fill="var(--color-wpm)" radius={4} />
+                  </RechartsBarChart>
+              </ChartContainer>
+            ) : (
+              <div className="flex items-center justify-center h-96 bg-muted rounded-lg">
+                <p className="text-muted-foreground">Chart will be displayed here.</p>
+              </div>
+            )}
           </div>
         </div>
       </DialogContent>
