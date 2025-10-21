@@ -55,7 +55,7 @@ export default function TypingPractice({ code, language, chapterIndex }: { code:
 
   return (
     <div className="w-full max-w-4xl flex flex-col items-center gap-8">
-      <Card className="w-full relative shadow-[0_0_25px_rgba(var(--primary),0.3)] ring-1 ring-primary/30">
+      <Card className="w-full relative shadow-md ring-1 ring-primary/10">
         <CardContent className="p-6 sm:p-8">
           <div className="font-code text-lg sm:text-xl leading-relaxed tracking-wider relative">
             <pre className="whitespace-pre-wrap">
