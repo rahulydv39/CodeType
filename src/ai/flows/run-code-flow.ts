@@ -10,6 +10,9 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import { spawn } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
 
 const RunCodeInputSchema = z.object({
@@ -33,7 +36,7 @@ const runCodeTool = ai.defineTool(
       outputSchema: RunCodeOutputSchema,
     },
     async (input) => {
-      console.log(`Executing ${input.language} code:`, input.code);
+      console.log(`Executing ${input.language} code...`);
       
       const execute = (command: string, args: string[]): Promise<{ output: string, error?: string }> => {
         return new Promise((resolve) => {
@@ -60,20 +63,51 @@ const runCodeTool = ai.defineTool(
           process.on('error', (err) => {
             resolve({ output: '', error: err.message });
           });
-
-          if (command === 'node' || command === 'python') {
-            process.stdin.write(input.code);
-            process.stdin.end();
-          }
         });
       };
 
+      const tempDir = os.tmpdir();
+      const tempId = `code-${Date.now()}`;
+
       try {
         if (input.language === 'javascript') {
-            return await execute('node', ['-e', input.code]);
+            const filePath = path.join(tempDir, `${tempId}.js`);
+            fs.writeFileSync(filePath, input.code);
+            return await execute('node', [filePath]);
         }
         if (input.language === 'python') {
-            return await execute('python', ['-c', input.code]);
+            const filePath = path.join(tempDir, `${tempId}.py`);
+            fs.writeFileSync(filePath, input.code);
+            return await execute('python', [filePath]);
+        }
+        if (input.language === 'typescript') {
+            const filePath = path.join(tempDir, `${tempId}.ts`);
+            fs.writeFileSync(filePath, input.code);
+            // ts-node is not installed, so this won't work out of the box.
+            // Assuming it's available in the execution environment.
+            // To make this work, one would need to `npm install -g ts-node`
+            // or have it as a dev dependency.
+            return await execute('ts-node', [filePath]);
+        }
+        if (input.language === 'c') {
+            const sourcePath = path.join(tempDir, `${tempId}.c`);
+            const exePath = path.join(tempDir, tempId);
+            fs.writeFileSync(sourcePath, input.code);
+            const compileResult = await execute('gcc', [sourcePath, '-o', exePath]);
+            if (compileResult.error) {
+                return { error: `Compilation failed: ${compileResult.error}`};
+            }
+            return await execute(exePath, []);
+        }
+        if (input.language === 'cpp') {
+            const sourcePath = path.join(tempDir, `${tempId}.cpp`);
+            const exePath = path.join(tempDir, tempId);
+fs.writeFileSync(sourcePath, input.code);
+            const compileResult = await execute('g++', [sourcePath, '-o', exePath]);
+            if (compileResult.error) {
+                return { error: `Compilation failed: ${compileResult.error}`};
+            }
+            return await execute(exePath, []);
         }
         return { error: `Execution for ${input.language} is not implemented.` };
       } catch (e: any) {

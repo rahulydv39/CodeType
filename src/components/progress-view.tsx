@@ -10,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { History, BarChart2 } from "lucide-react";
+import { History } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
@@ -20,6 +20,7 @@ import { codeSnippets } from "@/lib/code-snippets";
 type ProgressData = {
   date: string;
   wpm: number;
+  cpm: number;
   accuracy: number;
   time: number;
   language: string;
@@ -68,6 +69,7 @@ export default function ProgressView() {
                     <TableHead>Language</TableHead>
                     <TableHead>Chapter</TableHead>
                     <TableHead className="text-right">WPM</TableHead>
+                    <TableHead className="text-right">CPM</TableHead>
                     <TableHead className="text-right">Accuracy</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -77,6 +79,7 @@ export default function ProgressView() {
                       <TableCell>{codeSnippets[p.language]?.name}</TableCell>
                       <TableCell>{p.chapter}</TableCell>
                       <TableCell className="text-right">{Math.round(p.wpm)}</TableCell>
+                      <TableCell className="text-right">{Math.round(p.cpm)}</TableCell>
                       <TableCell className="text-right">{p.accuracy.toFixed(1)}%</TableCell>
                     </TableRow>
                   ))}

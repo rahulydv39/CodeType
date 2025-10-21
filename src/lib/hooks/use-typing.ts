@@ -14,6 +14,7 @@ export const useTyping = (text: string) => {
   const startTime = useRef<number>(0);
   const [totalTime, setTotalTime] = useState<number>(0);
   const [finalWPM, setFinalWPM] = useState(0);
+  const [finalCPM, setFinalCPM] = useState(0);
 
   const characters = useMemo(
     () =>
@@ -30,20 +31,27 @@ export const useTyping = (text: string) => {
   const currentPosition = typed.length;
   const isFinished = currentPosition === text.length;
 
-  const wpm = useMemo(() => {
-    if (state === 'finish') return finalWPM;
-    if (state !== 'run' || !startTime.current) return 0;
+  const { wpm, cpm } = useMemo(() => {
+    if (state === 'finish') return { wpm: finalWPM, cpm: finalCPM };
+    if (state !== 'run' || !startTime.current) return { wpm: 0, cpm: 0 };
     const currentTime = Date.now();
     const elapsedTime = (currentTime - startTime.current) / 1000 / 60; // in minutes
-    if (elapsedTime === 0) return 0;
+    if (elapsedTime === 0) return { wpm: 0, cpm: 0 };
+    
     const grossWPM = (typed.length / 5) / elapsedTime;
-    return grossWPM > 0 ? grossWPM : 0;
-  }, [typed, state, finalWPM]);
+    const grossCPM = typed.length / elapsedTime;
+
+    return { 
+      wpm: grossWPM > 0 ? grossWPM : 0,
+      cpm: grossCPM > 0 ? grossCPM : 0
+    };
+  }, [typed, state, finalWPM, finalCPM]);
 
   const accuracy = useMemo(() => {
     if (typed.length === 0) return 100;
-    return ((typed.length - errors) / typed.length) * 100;
-  }, [typed, errors]);
+    const correctChars = typed.split('').filter((char, index) => char === text[index]).length;
+    return (correctChars / typed.length) * 100;
+  }, [typed, text]);
 
   const reset = useCallback(() => {
     setState('start');
@@ -52,13 +60,15 @@ export const useTyping = (text: string) => {
     startTime.current = 0;
     setTotalTime(0);
     setFinalWPM(0);
+    setFinalCPM(0);
   }, []);
 
-  const saveProgress = useCallback((wpm: number, accuracy: number, time: number, language: string, chapterTitle: string) => {
+  const saveProgress = useCallback((wpm: number, cpm: number, accuracy: number, time: number, language: string, chapterTitle: string) => {
     const progress = JSON.parse(localStorage.getItem('typingProgress') || '[]');
     progress.push({
       date: new Date().toISOString(),
       wpm,
+      cpm,
       accuracy,
       time,
       language,
@@ -75,50 +85,62 @@ export const useTyping = (text: string) => {
          const duration = (endTime - startTime.current) / 1000;
          setTotalTime(duration);
 
-         const finalWPMValue = (typed.length / 5) / (duration / 60);
+         const durationInMinutes = duration / 60;
+         const finalWPMValue = (text.length / 5) / durationInMinutes;
+         const finalCPMValue = text.length / durationInMinutes;
+         
          setFinalWPM(finalWPMValue > 0 ? finalWPMValue : 0);
+         setFinalCPM(finalCPMValue > 0 ? finalCPMValue : 0);
       }
     }
-  }, [isFinished, typed.length]);
+  }, [isFinished, text.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      e.preventDefault();
+      
       if (state === 'finish') {
         if (e.key === 'Enter') reset();
         return;
       }
       
+      e.preventDefault();
+
       if (e.key === 'Escape') {
           reset();
           return;
       }
 
+      if (state === 'start' && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        setState('run');
+        startTime.current = Date.now();
+      }
+
       if (e.key === 'Tab') {
-        if (state === 'start') {
-          setState('run');
-          startTime.current = Date.now();
+        // Handle tab as 4 spaces
+        const spaces = '    ';
+        let correct = true;
+        for (let i = 0; i < spaces.length; i++) {
+            if (text[currentPosition + i] !== ' ') {
+                correct = false;
+                break;
+            }
         }
-        setTyped(prev => prev + '    ');
+        if(!correct) setErrors(prev => prev + 1);
+        setTyped(prev => prev + spaces);
         return;
       }
 
       if (e.key === 'Enter') {
-        if (state === 'start') {
-          setState('run');
-          startTime.current = Date.now();
-        }
         if (text[currentPosition] === '\n') {
           setTyped(prev => prev + '\n');
         } else {
           setErrors(prev => prev + 1);
+          setTyped(prev => prev + '\n');
         }
-      } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        if (state === 'start') {
-          setState('run');
-          startTime.current = Date.now();
-        }
-        
+        return;
+      }
+
+      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
         if (text[currentPosition] !== e.key) {
           setErrors(prev => prev + 1);
         }
@@ -142,5 +164,5 @@ export const useTyping = (text: string) => {
   }, [text, reset]);
 
 
-  return { state, characters, typed, errors, wpm, accuracy, totalTime, reset, saveProgress };
+  return { state, characters, typed, errors, wpm, cpm, accuracy, totalTime, reset, saveProgress };
 };

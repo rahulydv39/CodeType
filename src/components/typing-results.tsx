@@ -9,12 +9,13 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { BarChart, BarChart2 } from "lucide-react";
-import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartStyle } from "@/components/ui/chart";
+import { BarChart2 } from "lucide-react";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Bar, XAxis, YAxis, CartesianGrid, BarChart as RechartsBarChart } from "recharts";
 
 type TypingResultsProps = {
   wpm: number;
+  cpm: number;
   accuracy: number;
   errors: number;
   time: number;
@@ -22,9 +23,10 @@ type TypingResultsProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-export default function TypingResults({ wpm, accuracy, errors, time, open, onOpenChange }: TypingResultsProps) {
+export default function TypingResults({ wpm, cpm, accuracy, errors, time, open, onOpenChange }: TypingResultsProps) {
   const chartData = [
     { name: "WPM", value: Math.round(wpm), fill: "hsl(var(--primary))" },
+    { name: "CPM", value: Math.round(cpm), fill: "hsl(var(--primary))" },
     { name: "Accuracy", value: Math.round(accuracy), fill: "hsl(var(--accent))" },
     { name: "Errors", value: errors, fill: "hsl(var(--destructive))" },
   ];
@@ -51,6 +53,10 @@ export default function TypingResults({ wpm, accuracy, errors, time, open, onOpe
           <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
             <span className="text-muted-foreground">Words Per Minute (WPM)</span>
             <span className="text-xl font-bold font-headline text-primary">{Math.round(wpm)}</span>
+          </div>
+           <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
+            <span className="text-muted-foreground">Chars Per Minute (CPM)</span>
+            <span className="text-xl font-bold font-headline text-primary">{Math.round(cpm)}</span>
           </div>
           <div className="flex justify-between items-center p-3 bg-muted rounded-lg">
             <span className="text-muted-foreground">Accuracy</span>

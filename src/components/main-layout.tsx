@@ -14,7 +14,7 @@ import {
 import { codeSnippets } from "@/lib/code-snippets";
 import SidebarNav from "./sidebar-nav";
 import TypingPractice from "./typing-practice";
-import { Code, Bot, Sun, Moon } from "lucide-react";
+import { Code, Bot, Sun, Moon, History } from "lucide-react";
 import { Button } from "./ui/button";
 import ProgressView from "./progress-view";
 
@@ -42,10 +42,14 @@ export default function MainLayout() {
     <SidebarProvider>
       <Sidebar>
         <SidebarHeader>
-          <div className="flex items-center gap-2">
-            <Bot className="size-8 text-primary" />
-            <h1 className="text-xl font-headline font-semibold">CodeType</h1>
-          </div>
+          <div className="flex items-center gap-3">
+             <SidebarTrigger />
+             <Bot className="size-8 text-primary" />
+             <div>
+                <h1 className="text-xl font-headline font-semibold">CodeType</h1>
+                <p className="text-xs text-muted-foreground">Learn and Practice Programming by Typing</p>
+             </div>
+           </div>
         </SidebarHeader>
         <SidebarContent className="p-0">
           <SidebarNav
@@ -62,14 +66,11 @@ export default function MainLayout() {
       </Sidebar>
       <SidebarInset className="flex flex-col">
         <header className="flex items-center justify-between p-4 border-b">
-          <div className="flex items-center gap-2">
-            <SidebarTrigger />
-            <div className="flex items-center gap-2">
-              <Code className="size-5" />
-              <h2 className="text-lg font-headline font-medium">
+           <div className="flex items-center gap-2">
+            <Code className="size-5" />
+            <h2 className="text-lg font-headline font-medium">
                 {currentSnippet?.title || "Typing Practice"}
-              </h2>
-            </div>
+            </h2>
           </div>
           <div className="flex items-center gap-2">
             <ProgressView />
