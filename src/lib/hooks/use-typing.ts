@@ -110,50 +110,57 @@ const finalCPM = useMemo(() => {
         return;
       }
       
-      e.preventDefault();
+      const isSpecialKey = e.ctrlKey || e.metaKey || e.altKey;
 
       if (e.key === 'Escape') {
+          e.preventDefault();
           reset();
           return;
       }
 
-      if (state === 'start' && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (state === 'start' && e.key.length === 1 && !isSpecialKey) {
         setState('run');
         startTime.current = Date.now();
       }
       
-      if (e.key === 'Tab') {
-        const spaces = '   ';
-        let correct = true;
-        for (let i = 0; i < spaces.length; i++) {
-            if (currentPosition + i >= text.length || text[currentPosition + i] !== ' ') {
-                correct = false;
-                break;
+      if (state === 'run') {
+        e.preventDefault();
+        
+        if (e.key === 'Tab') {
+          const spaces = '   ';
+          let correct = true;
+          for (let i = 0; i < spaces.length; i++) {
+              if (currentPosition + i >= text.length || text[currentPosition + i] !== ' ') {
+                  correct = false;
+                  break;
+              }
+          }
+          if(!correct) setErrors(prev => prev + spaces.length);
+          setTyped(prev => prev + spaces);
+          return;
+        }
+
+        if (e.key === 'Enter') {
+          if (text[currentPosition] === '\n') {
+            setTyped(prev => prev + '\n');
+          } else {
+            setErrors(prev => prev + 1);
+            setTyped(prev => prev + '\n');
+          }
+          return;
+        }
+
+        if (e.key.length === 1 && !isSpecialKey) {
+          if (typed.length < text.length) {
+            if (text[currentPosition] !== e.key) {
+              setErrors(prev => prev + 1);
             }
-        }
-        if(!correct) setErrors(prev => prev + spaces.length);
-        setTyped(prev => prev + spaces);
-        return;
-      }
-
-      if (e.key === 'Enter') {
-        if (text[currentPosition] === '\n') {
-          setTyped(prev => prev + '\n');
-        } else {
-          setErrors(prev => prev + 1);
-          setTyped(prev => prev + '\n');
-        }
-        return;
-      }
-
-      if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
-        if (text[currentPosition] !== e.key) {
-          setErrors(prev => prev + 1);
-        }
-        setTyped(prev => prev + e.key);
-      } else if (e.key === 'Backspace') {
-        if (typed.length > 0) {
-           setTyped(prev => prev.slice(0, -1));
+            setTyped(prev => prev + e.key);
+          }
+        } else if (e.key === 'Backspace') {
+          if (typed.length > 0) {
+            setTyped(prev => prev.slice(0, -1));
+          }
         }
       }
     };
