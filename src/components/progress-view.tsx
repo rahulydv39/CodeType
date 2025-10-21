@@ -79,9 +79,9 @@ export default function ProgressView() {
                       <TableRow key={i}>
                         <TableCell>{codeSnippets[p.language]?.name || p.language}</TableCell>
                         <TableCell>{p.chapter}</TableCell>
-                        <TableCell className="text-right">{Math.round(p.wpm)}</TableCell>
-                        <TableCell className="text-right">{Math.round(p.cpm)}</TableCell>
-                        <TableCell className="text-right">{p.accuracy.toFixed(1)}%</TableCell>
+                        <TableCell className="text-right">{Math.round(p.wpm || 0)}</TableCell>
+                        <TableCell className="text-right">{Math.round(p.cpm || 0)}</TableCell>
+                        <TableCell className="text-right">{(p.accuracy || 0).toFixed(1)}%</TableCell>
                       </TableRow>
                     ))
                   ) : (
