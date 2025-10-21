@@ -24,7 +24,7 @@ function Character({ char, state }: { char: string; state: string }) {
         "text-muted-foreground/50": isUntyped,
       })}
     >
-      {char === '\n' ? '↵\n' : char}
+      {char}
     </span>
   );
 }
@@ -55,7 +55,7 @@ export default function TypingPractice({ code, language, chapterIndex }: { code:
 
   return (
     <div className="w-full max-w-4xl flex flex-col items-center gap-8">
-      <Card className="w-full relative shadow-md ring-1 ring-primary/10">
+      <Card className="w-full relative shadow-md shadow-primary/20">
         <CardContent className="p-6 sm:p-8">
           <div className="font-code text-lg sm:text-xl leading-relaxed tracking-wider relative">
             <pre className="whitespace-pre-wrap">
