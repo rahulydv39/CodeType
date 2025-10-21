@@ -43,7 +43,6 @@ export default function MainLayout() {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-3">
-             <SidebarTrigger />
              <Bot className="size-8 text-primary" />
              <div>
                 <h1 className="text-xl font-headline font-semibold">CodeType</h1>
@@ -67,6 +66,7 @@ export default function MainLayout() {
       <SidebarInset className="flex flex-col">
         <header className="flex items-center justify-between p-4 border-b">
            <div className="flex items-center gap-2">
+            <SidebarTrigger />
             <Code className="size-5" />
             <h2 className="text-lg font-headline font-medium">
                 {currentSnippet?.title || "Typing Practice"}
