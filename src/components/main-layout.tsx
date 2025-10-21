@@ -14,7 +14,7 @@ import {
 import { codeSnippets } from "@/lib/code-snippets";
 import SidebarNav from "./sidebar-nav";
 import TypingPractice from "./typing-practice";
-import { Code, Bot, Sun, Moon, History } from "lucide-react";
+import { Code, Bot, Sun, Moon } from "lucide-react";
 import { Button } from "./ui/button";
 import ProgressView from "./progress-view";
 

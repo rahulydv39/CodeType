@@ -25,7 +25,7 @@ function Character({ char, state }: CharacterProps) {
         "text-muted-foreground": state === "untyped",
       })}
     >
-      {char === '\n' ? '↵\n' : char}
+      {char}
     </span>
   );
 }

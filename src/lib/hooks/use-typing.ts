@@ -116,8 +116,7 @@ export const useTyping = (text: string) => {
       }
 
       if (e.key === 'Tab') {
-        // Handle tab as 4 spaces
-        const spaces = '    ';
+        const spaces = '   ';
         let correct = true;
         for (let i = 0; i < spaces.length; i++) {
             if (text[currentPosition + i] !== ' ') {
