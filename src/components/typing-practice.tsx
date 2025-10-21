@@ -10,25 +10,8 @@ import TypingResults from "./typing-results";
 import CodeOutput from "./code-output";
 import React, { useEffect, useState } from "react";
 import { codeSnippets } from "@/lib/code-snippets";
-
-type CharacterProps = {
-  char: string;
-  state: "correct" | "incorrect" | "untyped";
-};
-
-function Character({ char, state }: CharacterProps) {
-  return (
-    <span
-      className={cn("whitespace-pre-wrap", {
-        "text-foreground": state === "correct",
-        "text-red-500": state === "incorrect",
-        "text-muted-foreground": state === "untyped",
-      })}
-    >
-      {char}
-    </span>
-  );
-}
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 
 function Cursor() {
@@ -43,27 +26,79 @@ export default function TypingPractice({ code, language, chapterIndex }: { code:
   const isFinished = state === "finish";
 
   useEffect(() => {
-    if (isFinished && !showResults) {
+    if (isFinished) {
       setShowResults(true);
       const chapterTitle = codeSnippets[language].chapters[chapterIndex].title;
       saveProgress(wpm, cpm, accuracy, totalTime, language, chapterTitle);
     }
-  }, [isFinished, showResults, saveProgress, wpm, cpm, accuracy, totalTime, language, chapterIndex]);
+  }, [isFinished, saveProgress, wpm, cpm, accuracy, totalTime, language, chapterIndex]);
+  
+  const customStyle = {
+    ...vscDarkPlus,
+    'pre[class*="language-"]': {
+      ...vscDarkPlus['pre[class*="language-"]'],
+      backgroundColor: 'transparent',
+      padding: 0,
+      margin: 0,
+    },
+  };
+
+  const renderer = ({ rows, stylesheet, useInlineStyles }: any) => {
+    return rows.map((row: any, i: number) => {
+      let rowIndex = 0;
+      if (i > 0) {
+        for (let j = 0; j < i; j++) {
+          rowIndex += rows[j].children.length + 1; // +1 for newline
+        }
+      } else {
+        rowIndex = 0;
+      }
+
+      return (
+        <div key={`row-${i}`}>
+          {row.children.map((item: any, j: number) => {
+            const charIndex = rowIndex + j;
+            const isTyped = charIndex < typed.length;
+            const isCorrect = isTyped && typed[charIndex] === item.children[0].value;
+            const isCurrent = charIndex === typed.length;
+
+            return (
+              <span
+                key={`char-${i}-${j}`}
+                className={cn(
+                  item.properties.className,
+                   !isTyped && "text-muted-foreground/50",
+                   isTyped && !isCorrect && "text-red-500 bg-red-500/20",
+                )}
+                style={{color: isTyped && !isCorrect ? '' : item.properties.style.color}}
+              >
+                {isCurrent && <Cursor />}
+                {item.children[0].value}
+              </span>
+            );
+          })}
+          {i < rows.length - 1 && <span>{typed.length === rowIndex + row.children.length && <Cursor />}
+          <br/></span>}
+        </div>
+      );
+    });
+  };
 
   return (
     <div className="w-full max-w-4xl flex flex-col items-center gap-8">
       <Card className="w-full relative">
         <CardContent className="p-6 sm:p-8">
           <div className="font-code text-lg sm:text-xl leading-relaxed tracking-wider relative">
-            <p aria-label={code}>
-              {characters.map((char, index) => (
-                <React.Fragment key={index}>
-                  {typed.length === index && <Cursor />}
-                  <Character char={char.char} state={char.state} />
-                </React.Fragment>
-              ))}
-              {typed.length === code.length && isFinished && <Cursor />}
-            </p>
+            <SyntaxHighlighter
+              language={language === 'c' ? 'cpp' : language}
+              style={customStyle}
+              renderer={renderer}
+              wrapLines={true}
+              wrapLongLines={true}
+            >
+              {code}
+            </SyntaxHighlighter>
+            {typed.length === code.length && isFinished && <Cursor />}
           </div>
         </CardContent>
       </Card>
@@ -100,7 +135,10 @@ export default function TypingPractice({ code, language, chapterIndex }: { code:
               {language !== 'typing' && <CodeOutput code={code} language={language} />}
             </>
           )}
-          <Button onClick={reset} variant="outline" size="icon" aria-label="Restart Practice">
+          <Button onClick={() => {
+              reset();
+              setShowResults(false);
+            }} variant="outline" size="icon" aria-label="Restart Practice">
             <RefreshCw />
           </Button>
         </div>

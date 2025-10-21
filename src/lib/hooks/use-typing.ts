@@ -13,8 +13,6 @@ export const useTyping = (text: string) => {
 
   const startTime = useRef<number>(0);
   const [totalTime, setTotalTime] = useState<number>(0);
-  const [finalWPM, setFinalWPM] = useState(0);
-  const [finalCPM, setFinalCPM] = useState(0);
 
   const characters = useMemo(
     () =>
@@ -32,20 +30,21 @@ export const useTyping = (text: string) => {
   const isFinished = currentPosition === text.length;
 
   const { wpm, cpm } = useMemo(() => {
-    if (state === 'finish') return { wpm: finalWPM, cpm: finalCPM };
     if (state !== 'run' || !startTime.current) return { wpm: 0, cpm: 0 };
     const currentTime = Date.now();
     const elapsedTime = (currentTime - startTime.current) / 1000 / 60; // in minutes
     if (elapsedTime === 0) return { wpm: 0, cpm: 0 };
     
-    const grossWPM = (typed.length / 5) / elapsedTime;
-    const grossCPM = typed.length / elapsedTime;
+    const correctChars = typed.split('').filter((char, index) => char === text[index]).length;
+    const grossWPM = (correctChars / 5) / elapsedTime;
+    const grossCPM = correctChars / elapsedTime;
 
     return { 
       wpm: grossWPM > 0 ? grossWPM : 0,
       cpm: grossCPM > 0 ? grossCPM : 0
     };
-  }, [typed, state, finalWPM, finalCPM]);
+  }, [typed, text, state]);
+
 
   const accuracy = useMemo(() => {
     if (typed.length === 0) return 100;
@@ -59,8 +58,6 @@ export const useTyping = (text: string) => {
     setErrors(0);
     startTime.current = 0;
     setTotalTime(0);
-    setFinalWPM(0);
-    setFinalCPM(0);
   }, []);
 
   const saveProgress = useCallback((wpm: number, cpm: number, accuracy: number, time: number, language: string, chapterTitle: string) => {
@@ -76,6 +73,23 @@ export const useTyping = (text: string) => {
     });
     localStorage.setItem('typingProgress', JSON.stringify(progress));
   }, []);
+  
+  const finalWPM = useMemo(() => {
+    if (!isFinished || !totalTime) return 0;
+    const durationInMinutes = totalTime / 60;
+    const correctChars = typed.split('').filter((char, index) => char === text[index]).length;
+    const finalWPMValue = (correctChars / 5) / durationInMinutes;
+    return finalWPMValue > 0 ? finalWPMValue : 0;
+}, [isFinished, totalTime, typed, text]);
+
+const finalCPM = useMemo(() => {
+    if (!isFinished || !totalTime) return 0;
+    const durationInMinutes = totalTime / 60;
+    const correctChars = typed.split('').filter((char, index) => char === text[index]).length;
+    const finalCPMValue = correctChars / durationInMinutes;
+    return finalCPMValue > 0 ? finalCPMValue : 0;
+}, [isFinished, totalTime, typed, text]);
+
 
   useEffect(() => {
     if (isFinished) {
@@ -84,16 +98,9 @@ export const useTyping = (text: string) => {
          const endTime = Date.now();
          const duration = (endTime - startTime.current) / 1000;
          setTotalTime(duration);
-
-         const durationInMinutes = duration / 60;
-         const finalWPMValue = (text.length / 5) / durationInMinutes;
-         const finalCPMValue = text.length / durationInMinutes;
-         
-         setFinalWPM(finalWPMValue > 0 ? finalWPMValue : 0);
-         setFinalCPM(finalCPMValue > 0 ? finalCPMValue : 0);
       }
     }
-  }, [isFinished, text.length]);
+  }, [isFinished]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -114,17 +121,17 @@ export const useTyping = (text: string) => {
         setState('run');
         startTime.current = Date.now();
       }
-
+      
       if (e.key === 'Tab') {
         const spaces = '   ';
         let correct = true;
         for (let i = 0; i < spaces.length; i++) {
-            if (text[currentPosition + i] !== ' ') {
+            if (currentPosition + i >= text.length || text[currentPosition + i] !== ' ') {
                 correct = false;
                 break;
             }
         }
-        if(!correct) setErrors(prev => prev + 1);
+        if(!correct) setErrors(prev => prev + spaces.length);
         setTyped(prev => prev + spaces);
         return;
       }
@@ -163,5 +170,5 @@ export const useTyping = (text: string) => {
   }, [text, reset]);
 
 
-  return { state, characters, typed, errors, wpm, cpm, accuracy, totalTime, reset, saveProgress };
+  return { state, characters, typed, errors, wpm: state === 'finish' ? finalWPM : wpm, cpm: state === 'finish' ? finalCPM : cpm, accuracy, totalTime, reset, saveProgress };
 };
