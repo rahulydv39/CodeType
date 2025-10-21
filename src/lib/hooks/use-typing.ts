@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
@@ -12,6 +13,7 @@ export const useTyping = (text: string) => {
 
   const startTime = useRef<number>(0);
   const [totalTime, setTotalTime] = useState<number>(0);
+  const [finalWPM, setFinalWPM] = useState(0);
 
   const characters = useMemo(
     () =>
@@ -29,13 +31,14 @@ export const useTyping = (text: string) => {
   const isFinished = currentPosition === text.length;
 
   const wpm = useMemo(() => {
+    if (state === 'finish') return finalWPM;
     if (state !== 'run' || !startTime.current) return 0;
     const currentTime = Date.now();
     const elapsedTime = (currentTime - startTime.current) / 1000 / 60; // in minutes
     if (elapsedTime === 0) return 0;
     const grossWPM = (typed.length / 5) / elapsedTime;
     return grossWPM > 0 ? grossWPM : 0;
-  }, [typed, state]);
+  }, [typed, state, finalWPM]);
 
   const accuracy = useMemo(() => {
     if (typed.length === 0) return 100;
@@ -48,16 +51,35 @@ export const useTyping = (text: string) => {
     setErrors(0);
     startTime.current = 0;
     setTotalTime(0);
+    setFinalWPM(0);
+  }, []);
+
+  const saveProgress = useCallback((wpm: number, accuracy: number, time: number, language: string, chapterTitle: string) => {
+    const progress = JSON.parse(localStorage.getItem('typingProgress') || '[]');
+    progress.push({
+      date: new Date().toISOString(),
+      wpm,
+      accuracy,
+      time,
+      language,
+      chapter: chapterTitle
+    });
+    localStorage.setItem('typingProgress', JSON.stringify(progress));
   }, []);
 
   useEffect(() => {
     if (isFinished) {
       setState('finish');
       if (startTime.current) {
-         setTotalTime((Date.now() - startTime.current) / 1000);
+         const endTime = Date.now();
+         const duration = (endTime - startTime.current) / 1000;
+         setTotalTime(duration);
+
+         const finalWPMValue = (typed.length / 5) / (duration / 60);
+         setFinalWPM(finalWPMValue > 0 ? finalWPMValue : 0);
       }
     }
-  }, [isFinished]);
+  }, [isFinished, typed.length]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -70,6 +92,15 @@ export const useTyping = (text: string) => {
       if (e.key === 'Escape') {
           reset();
           return;
+      }
+
+      if (e.key === 'Tab') {
+        if (state === 'start') {
+          setState('run');
+          startTime.current = Date.now();
+        }
+        setTyped(prev => prev + '    ');
+        return;
       }
 
       if (e.key === 'Enter') {
@@ -111,5 +142,5 @@ export const useTyping = (text: string) => {
   }, [text, reset]);
 
 
-  return { state, characters, typed, errors, wpm, accuracy, totalTime, reset };
+  return { state, characters, typed, errors, wpm, accuracy, totalTime, reset, saveProgress };
 };

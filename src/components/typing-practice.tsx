@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useTyping } from "@/lib/hooks/use-typing";
@@ -8,6 +9,7 @@ import { RefreshCw } from "lucide-react";
 import TypingResults from "./typing-results";
 import CodeOutput from "./code-output";
 import React, { useEffect, useState } from "react";
+import { codeSnippets } from "@/lib/code-snippets";
 
 type CharacterProps = {
   char: string;
@@ -37,16 +39,18 @@ function Cursor() {
   );
 }
 
-export default function TypingPractice({ code, language }: { code: string, language: string }) {
-  const { state, characters, typed, errors, wpm, accuracy, totalTime, reset } = useTyping(code);
+export default function TypingPractice({ code, language, chapterIndex }: { code: string, language: string, chapterIndex: number }) {
+  const { state, characters, typed, errors, wpm, accuracy, totalTime, reset, saveProgress } = useTyping(code);
   const [showResults, setShowResults] = useState(false);
   const isFinished = state === "finish";
 
   useEffect(() => {
     if (isFinished) {
       setShowResults(true);
+      const chapterTitle = codeSnippets[language].chapters[chapterIndex].title;
+      saveProgress(wpm, accuracy, totalTime, language, chapterTitle);
     }
-  }, [isFinished]);
+  }, [isFinished, saveProgress, wpm, accuracy, totalTime, language, chapterIndex]);
 
   return (
     <div className="w-full max-w-4xl flex flex-col items-center gap-8">

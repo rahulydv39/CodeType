@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -15,6 +16,7 @@ import SidebarNav from "./sidebar-nav";
 import TypingPractice from "./typing-practice";
 import { Code, Bot, Sun, Moon } from "lucide-react";
 import { Button } from "./ui/button";
+import ProgressView from "./progress-view";
 
 export default function MainLayout() {
   const [selectedLanguage, setSelectedLanguage] = useState("javascript");
@@ -69,9 +71,12 @@ export default function MainLayout() {
               </h2>
             </div>
           </div>
-          <Button onClick={toggleTheme} variant="outline" size="icon">
-            {theme === 'light' ? <Moon className="size-5" /> : <Sun className="size-5" />}
-          </Button>
+          <div className="flex items-center gap-2">
+            <ProgressView />
+            <Button onClick={toggleTheme} variant="outline" size="icon">
+              {theme === 'light' ? <Moon className="size-5" /> : <Sun className="size-5" />}
+            </Button>
+          </div>
         </header>
         <main className="flex-1 p-4 md:p-8 flex items-center justify-center">
             {currentSnippet ? (
@@ -79,6 +84,7 @@ export default function MainLayout() {
                 key={`${selectedLanguage}-${selectedChapterIndex}`}
                 code={currentSnippet.code}
                 language={selectedLanguage}
+                chapterIndex={selectedChapterIndex}
               />
             ) : (
               <p>Select a chapter to begin.</p>
